@@ -3,9 +3,9 @@ The below is a listing of metadata fields available through FDsys MODS files for
 
 ## Package Metadata
 
+**Generic Metadata Fields**
 | **Entity** | **Description or Constant Value** | **Source** | **Arity** |
 | --- | --- | --- | --- |
-| Generic Metadata Fields |
 | collectionCode | `CHRG` | constant | 1 |
 | scope | `fdlp` | constant | 1 |
 | governmentAuthor1 | `Congress` | constant | 1 |
@@ -34,7 +34,10 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | recordOrigin | `machine generated` | constant | 1 |
 | publisher | `U.S. Government Publishing Office` | constant | 1 |
 | pageCount | The total page count of the PDF rendition of the hearing. | processing | 1 |
-| Collection-Specific Metadata Fields |
+
+**Collection-Specific Metadata Fields **
+| **Entity** | **Description or Constant Value** | **Source** | **Arity** |
+| --- | --- | --- | --- |
 | docClass | `HHRG`, `SHRG`, or `JHRG` | parser | 1 |
 | accessId | The access identifier for this package, used to uniquely identify this package to the public. Examples:CHRG-110hhrg32001 CHRG-110jhrg32002CHRG-110shrg23001-pt1CHRG-110hhrg32001-vol3CHRG-110hhrg23001-err | parser | 1 |
 | type | This is the type of hearing. Available values are: <br>`F`: Field</li><br/><li>`M`: Markup</li><br/><li>`O`: Oversight</li><br/><li>`AU`: Authorization</li><br/><li>`AP`: Appropriation</li><br/><li>`N`: Nomination</li><br/><li>`T`: Treaty</li><br/><li>`G`: General </li></ul> | parser | 1 |
@@ -46,15 +49,15 @@ The below is a listing of metadata fields available through FDsys MODS files for
 
 ## Granule Metadata
 
+**Generic Metadata Fields**
 | **Entity** | **Description or Constant Value** | **Source** | **Arity** |
 | --- | --- | --- | --- |
-| Generic Metadata Fields  |
 | title | The title of the document. | parser | 1 |
 | migratedDocId | otherIdentifier/[@idStandard="migrated-doc-id"] | parser | 0-1 |
 
+**Granule Collection Specific Metadata |**
 | **Entity** | **Description or Constant Value** | **Source** | **Arity** |
 | --- | --- | --- | --- |
-| Granule Collection Specific Metadata |
 | granuleClass | One of:  `FIRSTPART`, `OTHERPART`, `ERRATA` | parser | 1 |
 | accessId | The access identifier for the granule, used to uniquely identify this granule to the public. | parser | 1 |
 | agency | Not all hearings will have this element. Appropriation hearings will have it. (Parent tag) | parser | 0-n |
