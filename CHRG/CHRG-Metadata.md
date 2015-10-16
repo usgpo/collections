@@ -219,7 +219,9 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | location/url | displayLabel="PDF rendition" access="raw object" | http://www.gpo.gov/fdsys/pkg/accessId/pdf/accessId.pdf |
 | location/url | displayLabel="HTML rendition" access="raw object" | http://www.gpo.gov/fdsys/pkg/accessId/html/accessId.html |
 | identifier | type="preferred citation" | S. Hrg. congress-number,heading_Note:  This should only be included if docClass = SHRG _ |
-###Component 4:  Granule Metadata, _for all types of packages_ (single or multi-part) |
+
+###Component 4:  Granule Metadata, _for all types of packages_ (single or multi-part)
+
 | **MODS Schema Entry** | **MODS entity attributes** | **Entity(ies) &** **Special Instructions** |
 | --- | --- | --- |
 | extension/searchTitle |   | title |
@@ -231,21 +233,26 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | name | type="personal" | `<namePart>congMember/name</namePart>`<br/>`<affiliation>congMember/@chamber </affiliation>`<br/>`<role>`<br/>`    <roleTerm type="text">committee member</roleTerm>`<br/>`</role>`<br/>`<description>United States Congressional Member</description>`<br/>_Notes: <br/>- When available, use the [@type='authority-fnf'] version of congMember/name, otherwise use the [@type='parsed'] version._<br/>- _Generate a separate "name" element for each congMember/name instance._ |
 | name | `type="personal"` | ```<namePart>witness</namePart>```<br/>`<role>`<br/>```    <roleTerm authority="marcrelator" type="text">witness</roleTerm>```<br/>```<roleTerm authority="marcrelator" type="code">wit</roleTerm>```<br/>```</role><description>Hearing Witness</description>```<br/>_Note: Generate a separate "name" element for each witness instance._ |
 | name | `type="personal"` | ```<namePart>nominee</namePart>```<br/>`<role>`<br/>```<roleTerm type="text">nominee</roleTerm>```<br/>```</role><description>Hearing Nominee</description>```<br/>_Note: Generate a separate "name" element for each nominee instance._ |
-_Reference to Jacket Number_
+
+**Reference to Jacket Number**
+
 | **MODS Schema Entry** | **MODS entity attributes** | **Entity(ies) &** **Special Instructions** |
- | --- | --- | --- |
+| --- | --- | --- |
 | relatedItem | `type="isReferencedBy"` |   |
 | relatedItem/identifier | `type="Jacket citation"` | congJacket/@number |
- _References to H.A.S.C Numbers_ 
+
+**References to H.A.S.C Numbers**
+
 | **MODS Schema Entry** | **MODS entity attributes** | **Entity(ies) &** **Special Instructions** |
- | --- | --- | --- |
+| --- | --- | --- |
 | relatedItem | `type="isReferencedBy"` |   |
 | relatedItem/identifier | `type="HASC citation"` | H.A.S.C No. congHASC/congress-congHASC/number |
 
 ## CHRG Standard Reference MODS.xml Components
 
 ### Public and Private Laws
- _References to the Public and Private Laws _ 
+_References to the Public and Private Laws_
+
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
 | relatedItem/titleInfo/title |   | `United States Public Law law/@congress-law/@number`<br/> or <br/>`United States Private Law law/@congress-law/@number` <br/>_depending on if `isPrivate` is true or not._ |
@@ -253,7 +260,8 @@ _Reference to Jacket Number_
 | relatedItem/identifier        | `type="private law citation"` | Private Law law/@congress-law/@number<br/><br/>_Note 1:  Multiple law references will result in multiple <identifier> tags<br/><br/>Note 2:  Use this version if isPrivate is true_ |
 
 ### United States Code
- _References to the United States Code _ 
+_References to the United States Code_
+
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
 | relatedItem/titleInfo/title |   | "United States Code" |
@@ -265,7 +273,8 @@ _Reference to Jacket Number_
 | relatedItem/identifier        | `type="USC citation"` | USCode/@title U.S.C. App. USCode/appendix/@number<br/><br/>_Note 1:  Multiple titles or appendix entries will result in multiple <identifier> tags_ |
 
 ### Statutes At Large
-_References to the Statutes At Large _
+_References to the Statutes At Large_
+
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
 | relatedItem/titleInfo/title |   | "United States Statutes At Large" |
@@ -273,7 +282,8 @@ _References to the Statutes At Large _
 | relatedItem/identifier        | `type="Statute citation"` | statuteAtLarge/@volume Stat. statuteAtLarge/pages/@pages<br/><br/>_Note:  Multiple statuteAtLarge references will result in multiple <identifier> tags_ |
 
 ### Congressional Bills
-_References to the Congressional Bills _ 
+_References to the Congressional Bills_
+
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
 | relatedItem | `type="isReferencedBy"` |   |
@@ -283,7 +293,8 @@ _References to the Congressional Bills _
 | extension/context |   | bill/@context |
 
 ### Congressional Reports
-_References to the Congressional Reports _
+_References to the Congressional Reports_
+
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
 | relatedItem | `type="isReferencedBy"` |   |
@@ -293,7 +304,8 @@ _References to the Congressional Reports _
 | extension/context |   | congReport/@context |
 
 ### Congressional Documents
- _References to the Congressional Documents _
+_References to the Congressional Documents_
+
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
 | relatedItem | `type="isReferencedBy"` |   |
@@ -302,7 +314,7 @@ _References to the Congressional Reports _
 | extension/context |   | congDoc/@context |
 
 ### Congressional Hearings
-_References to the Congressional Hearings _
+_References to the Congressional Hearings_
 
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
@@ -337,10 +349,11 @@ _Note: `<name>` tags do not indicate referenced documents; therefore there is no
  |
 
 ### Code of Federal Regulations
- _References to the Code of Federal Regulations_
+_References to the Code of Federal Regulations_
+
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
-| relatedItem | `type="isReferencedBy"` | _Note 1:  This is a nested `<relatedItem>` within the granule's `<relatedItem>`__Note 2:  This `<relatedItem>` will likely be expanded once the CFR collection has been further defined (at a minimum, one or two URLs will be included)_ |
+| relatedItem | `type="isReferencedBy"` | _Note 1:  This is a nested `<relatedItem>` within the granule's `<relatedItem>`_<br/>_Note 2:  This `<relatedItem>` will likely be expanded once the CFR collection has been further defined (at a minimum, one or two URLs will be included)_ |
 | relatedItem/titleInfo/title |   | "Code of Federal Regulations" |
 | relatedItem/titleInfo/partNumber |   | Title cfr/@title Part cfr/part/@numbercfr/part/@detail<br/>_Note:  Include multiple `<partNumber>` tags, one for each CFR part_ |
 | relatedItem/titleInfo/partNumber |   | Title cfr/@title Chapter cfr/chapter/@numbercfr/part/@detail<br/>_Note:  Include multiple `<partNumber>` tags, one for each CFR chapter_ |
