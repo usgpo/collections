@@ -1081,11 +1081,6 @@ witnessTitleP =
 ## Witness Information
 
 ```
-witnessP =
-
-   { "\\n(\\w.+?)(?:oral (?:statement|testimony))?\\.*\\s+\\d+(?=\\s*\\n)","(\\n[a-zA-Z][^\\n]+?\\:\\s*\\n)|((?<=\\n)\\s*\\n {10,40}[a-zA-Z][^\\n]*)"}
-
-   CASE_INSENSITIVE + DOTALL
 
 witnessP2 =
 
