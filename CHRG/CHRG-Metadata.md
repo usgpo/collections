@@ -164,25 +164,26 @@ The below is a listing of metadata fields available through FDsys MODS files for
 
 ## CHRG MODS.xml Components
 
-###Component 1:  Metadata elements independent of package or granule 
+### Component 1:  Metadata elements independent of package or granule
+
 | **MODS Schema Entry** | **MODS entity attributes** | **Entity(ies) & Special Instructions** |
 | --- | --- | --- |
 | name\* | `type="corporate"` | `<namePart>United States Government Publishing Office</namePart>` <br> `<role>`<br/>```  <roleTerm authority="marcrelator" type="text">publisher</roleTerm>```<br/>```    <roleTerm authority="marcrelator" type="code">pbl</roleTerm>```<br/>`</role>`<br/>`<role>`<br/>```    <roleTerm authority="marcrelator" type="text">distributor</roleTerm>```<br/>```    <roleTerm authority="marcrelator" type="code">dst</roleTerm>```<br/>`</role>`|
-| name\* | type="corporate" | `<namePart>United States</namePart>`<br>`<namePart>governmentAuthor1</namePart>`<br/>`<namePart>governmentAuthor2</namePart>`<br/>`<role>`<br/>`<roleTerm authority="marcrelator"``type="text">author</roleTerm>`<br/>```    <roleTerm authority="marcrelator"```<br/>```  type="code">aut</roleTerm>```<br/>`</role>`<br/>`<description>Government Organization</description>` |
+| name\* | type="corporate" | `<namePart>United States</namePart>`<br>`<namePart>governmentAuthor1</namePart>`<br/>`<namePart>governmentAuthor2</namePart>`<br/>`<role>`<br/>`<roleTerm authority="marcrelator" type="text">author</roleTerm>`<br/>```    <roleTerm authority="marcrelator"  type="code">aut</roleTerm>```<br/>`</role>`<br/>`<description>Government Organization</description>` |
 | typeOfResource\* |   | typeOfResource |
 | genre\* |   | genre |
 | language/languageTerm\* | type="code" authority="iso639-2b" | language |
-| extension/collectionCode\* |   | collectionCode_<br/>Note:  These <extension> elements can be in a separate <extension> tags or merged with the top-level <mods>/<extension> tag._ |
+| extension/collectionCode\* |   | collectionCode<br/>_Note:  These `<extension>` elements can be in a separate `<extension>` tags or merged with the top-level `<mods>/<extension>` tag._ |
 | extension/category\* |   | category |
 | extension/waisDatabaseName\* |   | waisDatabaseName |
 | extension/branch\* |   | branch |
 | extension/dateIngested\* |   | dateIngested |
 | extension/starprintNumber |   | starprintNumber |
  
-###Component 2:  Metadata elements only for the issue (or package) as a whole 
-| **MODS Schema Entry** | **MODS entity attributes** | **Entity(ies) &Special Instructions** |
+### Component 2:  Metadata elements only for the issue (or package) as a whole 
+| **MODS Schema Entry** | **MODS entity attributes** | **Entity(ies) &amp; Special Instructions** |
 | --- | --- | --- |
-| titleInfo/title |   | title |
+| titleInfo/title | | title |
 | titleInfo/title | type="alternative" | title-fallback<br/> 1.When chamber is "S",<br/>title-fallback = congress S. Hrg. number<br/><br/>2.When chamber is "H",<br/>title-fallback = House Hearing, congress Congress<br/><br/>1. 3.When chamber is "J",<br/>title-fallback = Joint Hearing, congress Congress |
 | originInfo/publisher\* |   | publisher |
 | originInfo/dateIssued\* | encoding="w3cdtf" | dateIssued |
