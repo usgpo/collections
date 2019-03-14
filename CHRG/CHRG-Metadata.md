@@ -37,7 +37,7 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | Collection-Specific Metadata Fields |
 | docClass | `HHRG`, `SHRG`, or `JHRG` | parser | 1 |
 | accessId | The access identifier for this package, used to uniquely identify this package to the public. Examples:CHRG-110hhrg32001 CHRG-110jhrg32002CHRG-110shrg23001-pt1CHRG-110hhrg32001-vol3CHRG-110hhrg23001-err | parser | 1 |
-| type | This is the type of hearing. Available values are: <br>`F`: Field</li><br/><li>`M`: Markup</li><br/><li>`O`: Oversight</li><br/><li>`AU`: Authorization</li><br/><li>`AP`: Appropriation</li><br/><li>`N`: Nomination</li><br/><li>`T`: Treaty</li><br/><li>`G`: General </li></ul> | parser | 1 |
+| type | This is the type of hearing. Available values are: <br><li>`F`: Field</li><br/><li>`M`: Markup</li><br/><li>`O`: Oversight</li><br/><li>`AU`: Authorization</li><br/><li>`AP`: Appropriation</li><br/><li>`N`: Nomination</li><br/><li>`T`: Treaty</li><br/><li>`G`: General </li></ul> | parser | 1 |
 | chamber | Chamber of the hearing's committee. Allowed values are `HOUSE` for House of Representatives, `SENATE` for Senate or `JOINT` for Joint. The fallback value is `JOINT`. | parser | 1 |
 | congress | The congress number of the hearing (integer). | parser | 1 |
 | session | The session number of the hearing (integer). | parser | 1 |
