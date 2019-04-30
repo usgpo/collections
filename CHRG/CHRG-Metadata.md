@@ -56,9 +56,10 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | title | The title of the document. | parser | 1 |
 | migratedDocId | otherIdentifier/[@idStandard="migrated-doc-id"] | parser | 0-1 |
 
+## Granule Collection Specific Metadata
+
 | **Entity** | **Description or Constant Value** | **Source** | **Arity** |
 | --- | --- | --- | --- |
-| Granule Collection Specific Metadata |
 | granuleClass | One of:  `FIRSTPART`, `OTHERPART`, `ERRATA` | parser | 1 |
 | accessId | The access identifier for the granule, used to uniquely identify this granule to the public. | parser | 1 |
 | agency | Not all hearings will have this element. Appropriation hearings will have it. (Parent tag) | parser | 0-n |
@@ -111,7 +112,11 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | congMember/@chamberIdCode | The latest Chamber Id Code of the Congress member from the authority file if available.  Examples: `HI027701` or `S213`. | parser | 0-1 |
 | congMember/name | The Congress member's name. | parser | 1-n |
 | congMember/name/@type | The type of name, one of: `parsed`, `authority-fnf` (first-name-first), `authority-lnf` (last-name-first), and `authority-other`.<br/>1. `authority-fnf` will come from `<displayName original="true">`<br/>2. `authority-lnf` will come from `<displayName>` with no original= flag with the latest effective date <br/>3. `authority-other` will come from the authority name pieces, typically just "FirstName LastName" if not already specified.    | parser | 1 |
-| **Standard References** |||
+
+## Standard References
+
+| **Entity** | **Description or Constant Value** | **Source** | **Arity** |
+| --- | --- | --- | --- |
 | law | A reference to a public or private law. (parent tag only) | parser | 0-n |
 | law/@congress | The congress number of the law. (integer) | parser | 1 |
 | law/@number | The law number. (without the Congress number) (integer) | parser | 1 |
@@ -225,8 +230,7 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | location/url | displayLabel="HTML rendition" access="raw object" | http://www.gpo.gov/fdsys/pkg/accessId/html/accessId.html |
 | identifier | type="preferred citation" | S. Hrg. congress-number,heading_Note:  This should only be included if docClass = SHRG _ |
 
-###Component 4:  Granule Metadata, _for all types of packages_ (single or multi-part)
-
+### Component 4:  Granule Metadata, _for all types of packages_ (single or multi-part)
 | **MODS Schema Entry** | **MODS entity attributes** | **Entity(ies) &** **Special Instructions** |
 | --- | --- | --- |
 | extension/searchTitle |   | title |
@@ -304,8 +308,7 @@ _References to the Congressional Reports_
 | --- | --- | --- |
 | relatedItem | `type="isReferencedBy"` |   |
 | relatedItem/titleInfo/title |   | "United States Congress, congReport/@type Report congReport/@congress-congReport/@number"<br>_Where:_<br/>- congReport/@type_ is converted to the full user-readable name of the report.<br/> |
-| relatedItem/identifier        | `type="congressional report citation"` | congReport/@type congReport/@congress-congReport/@number <br/>_Where:<br/>- congReport/@type is converted to the abbreviated user-readable name for the bill._
- |
+| relatedItem/identifier        | `type="congressional report citation"` | congReport/@type congReport/@congress-congReport/@number <br/>_Where:<br/>- congReport/@type is converted to the abbreviated user-readable name for the bill._|
 | extension/context |   | congReport/@context |
 
 ### Congressional Documents
@@ -341,8 +344,8 @@ _Note:  `<name>` tags do not indicate referenced documents, therefore there is n
 
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
-| name | type="personal" | ```<namePart>congMember/name[@type='authority-fnf']</namePart><affiliation>FullNameofChamber</affiliation>```<br/>`     <role>`<br/>`    <roleTerm authority="marcrelator" type="text">XXXX</roleTerm>`<br/>`    <roleTerm authority="marcrelator" type="code">XXX</roleTerm>`<br/>`</role><description>United States Congress Member</description>`<br/><br/>_NOTE: 1._If the authority name is not present use ```congMember[@role='XXXXXX']/name[@type='parsed']```_<br/>2._Multiple congress members will create multiple `<name>` tags (very rare, but possible)_<br/>3._FullNameofChamber = 'United States Senate' if the congMember/@chamber is `S`, 'United States House of Representatives' if the congMember/@chamber is `H`
- |
+| name | type="personal" | ```<namePart>congMember/name[@type='authority-fnf']</namePart><affiliation>FullNameofChamber</affiliation>```<br/>`     <role>`<br/>`    <roleTerm authority="marcrelator" type="text">XXXX</roleTerm>`<br/>`    <roleTerm authority="marcrelator" type="code">XXX</roleTerm>`<br/>`</role><description>United States Congress Member</description>`<br/><br/>_NOTE: 1._If the authority name is not present use ```congMember[@role='XXXXXX']/name[@type='parsed']```_<br/>2._Multiple congress members will create multiple `<name>` tags (very rare, but possible)_<br/>3._FullNameofChamber = 'United States Senate' if the congMember/@chamber is `S`, 'United States House of Representatives' if the congMember/@chamber is `H` |
+
 
 ### Congressional Committees
 
@@ -350,8 +353,7 @@ _Note: `<name>` tags do not indicate referenced documents; therefore there is no
 
 | MODS Schema Entry | MODS Entity Attributes | Entity(ies) & Special Instructions |
 | --- | --- | --- |
-| name | type="corporate" | ```<namePart>United States</namePart>```<br/>```<namePart>Congress</namePart>```<br/>```<namePart>congCommittee/@chamber</namePart>```<br/>```<namePart>congCommittee/name[@type='authority-standard']</namePart>```<br/>`<role>`<br/>```    <roleTerm authority= "marcrelator" type="text">associated name</roleTerm>```<br/>```   <roleTerm authority= "marcrelator" type="code">asn</roleTerm>```<br/>`</role>`<br/>```<description>United States Congressional Committee</description>```<br/><br/>_NOTE: _<br/>   1._If the authority name is not present use _congCommittee_/name[@type='parsed'].<br/>2._Use full name value of congCommittee/@chamber _<br/>3. _If congCommittee/@chamber is unknown, leave blank._
- |
+| name | type="corporate" | ```<namePart>United States</namePart>```<br/>```<namePart>Congress</namePart>```<br/>```<namePart>congCommittee/@chamber</namePart>```<br/>```<namePart>congCommittee/name[@type='authority-standard']</namePart>```<br/>`<role>`<br/>```    <roleTerm authority= "marcrelator" type="text">associated name</roleTerm>```<br/>```   <roleTerm authority= "marcrelator" type="code">asn</roleTerm>```<br/>`</role>`<br/>```<description>United States Congressional Committee</description>```<br/><br/>_NOTE: _<br/>   1._If the authority name is not present use _congCommittee_/name[@type='parsed'].<br/>2._Use full name value of congCommittee/@chamber _<br/>3. _If congCommittee/@chamber is unknown, leave blank._|
 
 ### Code of Federal Regulations
 _References to the Code of Federal Regulations_
