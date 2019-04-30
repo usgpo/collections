@@ -34,7 +34,11 @@ The below is a listing of metadata fields available through FDsys MODS files for
 | recordOrigin | `machine generated` | constant | 1 |
 | publisher | `U.S. Government Publishing Office` | constant | 1 |
 | pageCount | The total page count of the PDF rendition of the hearing. | processing | 1 |
-| Collection-Specific Metadata Fields |
+ 
+## Collection-Specific Metadata Fields
+
+| **Entity** | **Description or Constant Value** | **Source** | **Arity** |
+| --- | --- | --- | --- |
 | docClass | `HHRG`, `SHRG`, or `JHRG` | parser | 1 |
 | accessId | The access identifier for this package, used to uniquely identify this package to the public. Examples:CHRG-110hhrg32001 CHRG-110jhrg32002CHRG-110shrg23001-pt1CHRG-110hhrg32001-vol3CHRG-110hhrg23001-err | parser | 1 |
 | type | This is the type of hearing. Available values are: <br>`F`: Field</li><br/><li>`M`: Markup</li><br/><li>`O`: Oversight</li><br/><li>`AU`: Authorization</li><br/><li>`AP`: Appropriation</li><br/><li>`N`: Nomination</li><br/><li>`T`: Treaty</li><br/><li>`G`: General </li></ul> | parser | 1 |
