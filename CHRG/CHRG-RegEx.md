@@ -6,7 +6,7 @@ Contents
 
 ## Star Print Number
 ```
-starprintP =
+STARPRINT_P =
 
    "(\\s*star print\\s*)|(\\s*<star>\\s*)"
 
@@ -15,75 +15,97 @@ starprintP =
 ```
 ## Cover Page
 ```
-preCoverPageT = "\r?\n(?:--+|\_\_+)\r?\n"
+COVER_PAGE_P =
 
-pre2CoverPageT = "<spaces>-{5,}<spaces>"
+   "(U\.S\. GOVERNMENT P(RINT|UBLISH)ING OFFICE\r?\n|House of representatives)"
 
-coverSubCommitteePageP =
+   CASE_INSENSITIVE | PRESERVE_WHITESPACE
 
-   "(^\\s*(?:(?:before (?:the|a))|(?:hearing\\s+of the))\r?\n\r?\n?[\\W\\w]+ (?:CONGRESS|SESSION)\r?\n)"
+COVER_END_P =
+
+   "\b(?:(?:1st|2n?d)\s+Session\s+|Printed (?:for the use|by authority) of(?:\s+the)?\s+){2}[^\n]+"
+
+   CASE_INSENSITIVE
+
+COVER_END2_P =
+
+   "^\s*U\.S\. GOVERNMENT P(RINT|UBLISH)ING OFFICE\s*$"
+
+   CASE_INSENSITIVE | MULTILINE
+
+COVER_END3_P =
+
+   "\s*Printed (?:for the use|by authority) of"
+
+   CASE_INSENSITIVE
+
+COVER_END4_P =
+
+   "-{8,}\r?\n\s*For sale by the (Superintendent of Documents, )?U\.S\. Government P(rint|ublish)ing Office\r?\n|C O N T E N T S"
+
+   CASE_INSENSITIVE
+
+COVER_END5_P =
+
+   "\r?\n\s*Washington, D\.?C\.\r?\n"
+
+   CASE_INSENSITIVE
+
+COVER_END6_P =
+
+   "\r?\n\d{2}-\d{3}"
+
+   CASE_INSENSITIVE
+
+COVER_END7_P =
+
+   "\r?\n\s*-{5,}"
+
+   CASE_INSENSITIVE
+
+COVER_END8_P =
+
+   "House of representatives"
+
+   CASE_INSENSITIVE
+
+// Finding committee names on the cover page
+
+COMMITTEE_P =
+
+   "(^\s*(?:(?:before (?:the|a))|(?:hearing\s+of the))\r?\n\r?\n?[\W\w]+ (?:CONGRESS|SESSION)\r?\n)"
 
    CASE_INSENSITIVE | MULTILINE | PRESERVE_WHITESPACE
 
-coverPageP =
+COMMITTEE2_P =
 
-   "(.*\r?\n\r?\n\\s*(?:(?:Printed (?:for the use|by authority )of)|(?:U\\.S\\. GOVERNMENT (PRINTING|PUBLISHING) OFFICE\r?\n)|(?:-{8,}\r?\n\\s*For sale by the Superintendent of Documents, )|(?:-{8,}\r?\n\\s*For sale by the U\\.S\\. Government (Printing|Publishing) Office\r?\n)))|(.*\r?\n\\s*-{5,})|(.*\r?\n\\d{2}-\\d{3}|(.*\r?\nWashington, D.C.\r?\n))"
+   "(\s+(?:1st|2n?d)\s+Session(?:\s+})?(?:\s+Printed for the use of the)?\s+(?:Commission|Committee)\s+on\s+[^\n]+)"
 
-   CASE_INSENSITIVE | MULTILINE | DOTALL | PRESERVE_WHITESPACE)
+   CASE_INSENSITIVE | PRESERVE_WHITESPACE
 
-coverPage2P =
+COMMITTEE3_P =
 
-   "(U\\.S\\. GOVERNMENT (PRINTING|PUBLISHING) OFFICE\r?\n|House of representatives)"
+   "\b(congressional\s*-\s*executive\s+commission\s+on\s+china)\b"
 
-   CASE_INSENSITIVE | MULTILINE | DOTALL | PRESERVE_WHITESPACE
+   CASE_INSENSITIVE | PRESERVE_WHITESPACE
 
-coverPageEnd1P =
+COMMITTEE4_P =     // pre-match pattern, match pattern, post-match pattern
 
-   "(\\s*Printed (?:for the use|by authority) of)"
+   "(CONGRESS\s*\n)|(SESSION\s*\n)", "(subcommittee on.+?)(\n\s*){2,}", null
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE | DOT_ALL
 
-coverPageEnd2P =
+HOST_ORG_P =
 
-   "(^\\s*U\\.S\\. GOVERNMENT (PRINTING|PUBLISHING) OFFICE$)"
+   "(?:before +(?:the|a))\s+(.+?)(?:\s*(?:one|two|three|four|five|six|seven|eight|nine)\s+hundred)"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE | DOT_ALL
 
-coverPageEnd3P =
+HOST_ORG2_P =
 
-   "(-{8,}\r?\n\\s*For sale by the U\\.S\\. Government (Printing|Publishing) Office\r?\n|C O N T E N T S)"
+   "(CONGRESSIONAL-EXECUTIVE COMMISSION ON\s*[^\n]+)"
 
-   CASE_INSENSITIVE | MULTILINE
-
-coverPageEnd4P =
-
-   "(-{8,}\r?\n\\s*For sale by the Superintendent of Documents, U\\.S\\. GOVERNMENT (PRINTING|PUBLISHING) OFFICE\r?\n)"
-
-   CASE_INSENSITIVE | MULTILINE
-
-coverPageEnd5P =
-
-   "(\r?\n\\d{2}-\\d{3})"
-
-   CASE_INSENSITIVE | MULTILINE
-
-coverPageEnd6P =
-
-   "(\r?\n\\s*Washington, D\\.?C\\.\r?\n)"
-
-   CASE_INSENSITIVE | MULTILINE
-
-coverPageEnd7P =
-
-   "(\r?\n\\s*-{5,})"
-
-   CASE_INSENSITIVE | MULTILINE
-
-coverPageEnd8P =
-
-   "(House of representatives)"
-
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 ```
 
