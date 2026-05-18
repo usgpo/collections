@@ -95,18 +95,6 @@ COMMITTEE4_P =     // pre-match pattern, match pattern, post-match pattern
 
    CASE_INSENSITIVE | DOT_ALL
 
-HOST_ORG_P =
-
-   "(?:before +(?:the|a))\s+(.+?)(?:\s*(?:one|two|three|four|five|six|seven|eight|nine)\s+hundred)"
-
-   CASE_INSENSITIVE | DOT_ALL
-
-HOST_ORG2_P =
-
-   "(CONGRESSIONAL-EXECUTIVE COMMISSION ON\s*[^\n]+)"
-
-   CASE_INSENSITIVE
-
 ```
 
 ## Title
@@ -121,27 +109,37 @@ HOST_ORG2_P =
 
  */
 
-titleP =
+TITLE_P =
 
-   "^\\.\r?\n\\s*(.+)","[=\_-]{2,}|(hearing\\s*\\n)"
+   // pre-match, match, and post match expressions
+
+   null, "^\\.\r?\n\\s*(.+)", "[=_-]{2,}|(hearing\\s*\n)"
 
    MULTILINE | DOTALL
 
-titleP2 =
+TITLE2_P =
 
    "^\\.(?:\\s+S\\. +Hrg\\. +\\d+-\\d+)?\r?\n\\s*((?:.+\r?\n)*)"
 
    MULTILINE
 
 
+```
+## Match the first 200 lines
+
+```
+
+LINES200_P =
+
+   "^(?:[^\n]*\n){200}"
 
 ```
 ## Appropriation Title
 
 ```
-appropriationTitleP =
+APPROP_TITLE_P =
 
-   "(Appropriations?)"
+   "Appropriation"
 
    CASE_INSENSITIVE
 
@@ -149,9 +147,9 @@ appropriationTitleP =
 ## Appropriation Committee
 
 ```
-appropriationCommitteeP =
+APPROP_CMTE_P =
 
-   "\\s*(Committee on Appropriations),?\\s*"
+   "Committee on Appropriations"
 
    CASE_INSENSITIVE
 
@@ -169,7 +167,7 @@ appropriationCommitteeP =
 
  */
 
-typeFP =
+TYPE_F_P =
 
    "\n\\s+(F)ield (?:Hearing|Briefing)\r?\n"
 
@@ -185,7 +183,7 @@ typeFP =
 
  */
 
-typeMP =
+TYPE_M_P =
 
    "\n\\s+(?:Hearings and |Compilation of )?(M)ark ?ups?"
 
@@ -201,7 +199,7 @@ typeMP =
 
  */
 
-typeM2P =
+TYPE_M2_P =
 
    "(M)ark-?up (?:on|of)"
 
@@ -227,7 +225,7 @@ typeM2P =
 
  */
 
-typeOP =
+TYPE_O_P =
 
    "\n\\s+(O)versight (?:and Legislative |Field )?Hearings?\r?\n"
 
@@ -243,9 +241,9 @@ typeOP =
 
  */
 
-typeO2P =
+TYPE_O2_P =
 
-   "\n\\s+(O)versight Hearing"
+   "^\\s*(?:Annual\\s+)?(O)versight (?:Hearing|of)"
 
    CASE_INSENSITIVE
 
@@ -265,7 +263,7 @@ typeO2P =
 
  */
 
-typeAUP =
+TYPE_AU_P =
 
    "(?:Re)?(au)thorization(?: on)?"
 
@@ -283,7 +281,7 @@ typeAUP =
 
  */
 
-typeTP =
+TYPE_T_P =
 
    "(T)reaty (?:on|act)"
 
@@ -304,9 +302,9 @@ typeTP =
 
  */
 
-chamberHouseP =
+CHAMBER_HOUSE_P =
 
-   "\n\\s*(?:U.S. )?(HOUSE)(?: OF)? REPRESENTATIVES?\\s*\r?\n"
+   "\\s+(HOUSE)(?: OF REPRESENTATIVES)\\s"
 
    CASE_INSENSITIVE
 
@@ -320,13 +318,13 @@ chamberHouseP =
 
  */
 
-chamberSenateP =
+CHAMBER_SENATE_P =
 
-   "\n\\s*UNITED STATES (SENATE)\r?\n"
+   "\\s+(?:UNITED STATES (SENATE)|U.S. (SENATE))\\s"
 
    CASE_INSENSITIVE
 
-chamberSenateAltP =
+CHAMBER_SENATE2_P =
 
    " {3,}S\\. +Hrg\\."
 
@@ -342,15 +340,15 @@ chamberSenateAltP =
 
  */
 
-chamberJointP =
+CHAMBER_JOINT_P =
 
    "(JOINT) (?:COMMITTEE )?HEARING"
 
    CASE_INSENSITIVE
 
-chamberFallBackP =
+CHAMBER_JOINT_CSCE_P =
 
-   "(?:(Senate)|(House) of Representatives?)"
+   "\\bCSCE\\s+\\d+-\\d+-\\d+\\b"
 
    CASE_INSENSITIVE
 
@@ -358,21 +356,16 @@ chamberFallBackP =
 ## Helper Patterns Embedded In Other Regular Expressions
 
 ```
-decimalsT = "ten|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety"
+DIGITS_RX = "(?:one|two|three|four|five|six|seven|eight|nine)"
 
-teensT = "eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen"
+TENS_RX = "(?:twen|thir|for|fif|six|seven|eigh|nine)"
 
-numbers1T = "one|two|three|four|five|six|seven|eight|nine"
+ORDS1_RX = "first|second|third|fourth|fifth|sixth|seventh|eighth|ninth"
 
-ordinals1T = "first|second|third|fourth|fifth|sixth|seventh|eighth|ninth"
+ORDS2_RX = "eleventh|twelfth|(?:thir|four|fif|six|seven|eigh|nine)teenth"
 
-ordinals2T = "(?:" + teensT + ")th"
+ORDS3_RX = "tenth|" + TENS_RX + "(?:tieth|ty-(?:" + ORDS1_RX + "))"
 
-ordinals3T = "(?:" + decimalsT + ")th"
-
-ordinals4T = "(?:" + decimalsT + ")-(?:" + ordinals1T + ")"
-
-ordinalsT = ordinals1T + "|" + ordinals2T + "|" + ordinals3T + "|" + ordinals4T
 
 ```
 
@@ -389,11 +382,11 @@ ordinalsT = ordinals1T + "|" + ordinals2T + "|" + ordinals3T + "|" + ordinals4T
 
  */
 
-congressNumberP =
+CONGRESS_P =
 
-   "\\s*S\\. Hrg\\. (\\d{3})-(\\d+)(?:, Pa?r?t\\.? ([\\dIVX]+\\w?))?\r?\n"
+   "\\s*(S\\. Hrg\\.) (\\d{3})-(\\d+)(?:, Pa?r?t\\.? ([\\dIVX]+\\w?))?\r?\n"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 ```
 
@@ -410,22 +403,22 @@ congressNumberP =
 
  */
 
-congressNumberLettersP =
+CONGRESS_PHRASE_P =
 
-   "\n\\s*((?:" + numbers1T + ") hundred (?:AND )?(?:" + ordinalsT + ")) CONGRESS"
+   "^\\s*(" + DIGITS_RX + "\\s+HUNDRED\\s+(?:AND\\s+)?(?:" + ORDS1_RX + "|" + ORDS2_RX + "|" + ORDS3_RX + "))\\s+CONGRESS\\s*$"
 
-   CASE_INSENSITIVE
+   CASE_INSENSITIVE | MULTILINE
 
 ```
 
 ## Congress Original, Congress
 
 ```
-congressNumber2P =
+CONGRESS_NUMBER_P =
 
    "\n\\s*(\\d{3})TH CONGRESS\r?\n"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 ```
 
@@ -444,7 +437,7 @@ congressNumber2P =
 
  */
 
-serialNumberP =
+SERIAL_P =
 
    "\\s*Serial (?:Number |No\\. )?(\\d+)-([\\d\\w]+)(?:, Part (\\d))?"
 
@@ -469,7 +462,7 @@ serialNumberP =
 
  */
 
-serialNumberWithParanP =
+SERIAL_CITATION_P =
 
    "\n\\s*\\(?(\\d{3})-([\\d\\w]+)\\)?\r?\n"
 
@@ -495,25 +488,12 @@ serialNumberWithParanP =
 
  */
 
-serialNumbersP =
+SERIALS_P =
 
-   "\n\\s*Serial (?:Numbers |Nos\\. )?((?:(?:and )?\\d+-\\d+(?:,\\s*)?)+)\r?\n"
+   "\n\\s*Serial (?:Numbers |Nos\\. )?(?:(?:and )?\\d+-(\\d+)(?:,\\s*)?)+\r?\n"
 
    CASE_INSENSITIVE
 
-/**
-
- * Extracts #-#.
-
- * Matches two numbers separated by dash "-". Only second number is returned
-
- * as "number". This pattern is used in post-process.
-
- */
-
-numbersP =
-
-   "\\d+-(\\d+)"
 
 ```
 
@@ -526,9 +506,27 @@ numbersP =
 
  */
 
-numbers2P =
+HRG_NUM_P =
 
-   "S\\.\\s*Hrg\\.\\s*\\d+-(\\d+)"
+   "(S\\.\\s*Hrg\\.)\\s*\\d+-(\\d+)"
+
+   CASE_INSENSITIVE
+
+HRG_NUM_JCS_P =
+
+ 	"\\b(JCS-)(\\d+-\\d+)\\b"
+
+   CASE_INSENSITIVE
+
+HRG_NUM_CSCE_P =
+
+ 	"\\b(CSCE)\\s+(\\d+)-(\\d+-\\d+)\\b"
+
+   CASE_INSENSITIVE
+
+SBC_NUM_P =
+
+ 	"Small Business Committee Document Number \\d{3}-(\\d{3})"
 
    CASE_INSENSITIVE
 
@@ -537,32 +535,33 @@ numbers2P =
 ## Volume Number
 
 ```
-volumeNumberP =
+VOLUME_P =
 
-   "volumeNumber" }, "\n\r?\n *Volume ([\\dIV]+)"
-
-   CASE_INSENSITIVE | MULTILINE
-
-volumeNumber2P =
-
-   "S\\.\\s*Hrg\\.\\s*\\d+-\\d+\\.?\\s*(?:Vol|Volume)\\.?\\s*([\\dIV]+)"
+ 	"\n\r?\n *Volume ([\\dIV]+)"
 
    CASE_INSENSITIVE
+
+VOL_NUM_P =
+
+   "S\\.\\s*Hrg\\.\\s*\\d+-\\d+\\.?\\s*Vol(?:ume)?\\.?\\s*([\\dIV]+)"
+
+   CASE_INSENSITIVE
+
 
 ```
 
 ## Part Number
 
 ```
-partNumberP =
+PART_P =
 
-   "partNumber" }, "\r?\n\\s*Part (\\d)\\s*\r?\n"
+   "\r?\n\\s*Part (\\d)\\s*\r?\n"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
-partNumber2P =
+PART_NUM_P =
 
-   "S\\.\\s*Hrg\\.\\s*\\d+-\\d+\\.?\\s*(?:Part|Pt)\\.?\\s*(\\d)"
+   "S\\.\\s*Hrg\\.\\s*\\d+-\\d+\\.?\\s*P(?:ar)?t\\.?\\s*(\\d)"
 
    CASE_INSENSITIVE
 
@@ -572,7 +571,7 @@ partNumber2P =
 ```
 /**
 
- * Extracts if hearing is First Session.
+ * Extracts if hearing is First or Second Session.
 
  * Matches text:
 
@@ -580,55 +579,52 @@ partNumber2P =
 
  */
 
-firstSessionP =
+SESSION_P =
 
-   "\n\\s*(FIRST) SESSION\r?\n"
-
-   CASE_INSENSITIVE
-
-/**
-
- * Extracts if hearing is Second Session.
-
- * Matches text
-
- * Second Session
-
- */
-
-secondSessionP =
-
-   "\n\\s*(SECOND) SESSION\r?\n"
+   "\n\\s*(FIRST|SECOND) SESSION\r?\n"
 
    CASE_INSENSITIVE
+
 
 ```
 ## Held Date
 
 ```
+// Helper Patterns
+
+MONTHS = "(january|february|march|april|may|june|ju?ly|august|october|(?:septm?|nov|dec)embe?r)"
+
+DAYS = "(?:mon|tues|wednes|thurs|fri|satur|sun)day"
+
 /**
 
- * Extracts dates.
+ * Extracts held dates.
 
  * Matches following expressions:
 
  * January 23, 2007
 
- * MARCH 1, 2003
+ * Monday, MARCH 1, 2003
 
  */
 
-heldP =
+HELD_DATE_P =
 
-   "((?:" + monthsAllT + ") \\d{1,2}, \\d{4}),?\r?\n"
+   "(?<!ending\\s)" + MONTHS + "*,?\\s*(\\d{1,2})(?:[,; ]+\\s*)(\\d{4})*"
 
    CASE_INSENSITIVE
 
-heldP\_Centered =
+HELD_DATE2_P =
 
-   "^\\s+((?:" + monthsAllT + ") \\d{1,2}, \\d{4})\\s*$"
+   "\n\\s+(?:" + DAYS + "[, ]+)?(" + MONTHS + ".+\\d{4}\\.?\\s*\n)"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
+
+HELD_DATE3_P =
+
+   "\n\\s+(?:hearing held[\\w\\s,]*)(?:" + DAYS + "[, ]+)?(" + MONTHS + ".+\\d{4}\\.?\\s*\n)"
+
+   CASE_INSENSITIVE
 
 ```
 ## Date
@@ -636,191 +632,28 @@ heldP\_Centered =
 ```
 /**
 
- * Extracts dates.
-
- * Matches following expressions:
-
- * February 8, April 17, and May 15, 2007
+ * Patterns in support of finding normalized parts of held dates
 
  */
 
-held3P =
-
-   "((?:(?:" + monthsAllT + ") \\d{1,2},? (?:and )?){2,}\\d{4})"
-
-   CASE_INSENSITIVE
-
-held3P\_Centered =
-
-   "^\\s+((?:(?:" + monthsAllT + ") \\d{1,2},? (?:and )?){2,}\\d{4})\\s*$"
-
-   CASE_INSENSITIVE | MULTILINE
-
-/**
-
- * Extracts dates.
-
- * Matches following expressions:
-
- * APRIL 8, 9, 15 AND 17, 1997
-
- * JANUARY 30 AND 31, 2007
-
- */
-
-held2P =
-
-   "((?:" + monthsAllT + ") (?:\\s|,|\\d{1,2}|and){5,}\\d{4})"
-
-   CASE_INSENSITIVE
-
-held2P\_Centered =
-
-   "^\\s+((?:" + monthsAllT + ") (?:\\s|,|\\d{1,2}|and){5,}\\d{4})\\s*$"
-
-   CASE_INSENSITIVE | MULTILINE
-
-/**
-
- * Extracts dates.
-
- * Matches following expressions:
-
- *                         THURSDAY, MARCH 13, 1997
-
- *                         Friday, June 21, 2002.
-
- */
-
-held4P =
-
-   "^\\s*(?:" + daysAllT + "), ((?:(?:" + monthsAllT + ") \\d{1,2}, \\d{4}))\\.?\\s*$"
-
-   CASE_INSENSITIVE | MULTILINE
-
-/**
-
- * Extracts Dates
-
- * Matches the following expression:
-
- *                  February 6, 2009.--Ordered to be printed
-
- */
-
-held6P =
-
-   "((?:" + monthsAllT + ") \\d{1,2}, \\d{4}),?(?:\\.--Ordered to be printed)?\r?\n"
-
-   CASE_INSENSITIVE
-
-/**
-
- * Extracts dates.
-
- * Matches following expressions:
-
- *                         MARCH 1997
-
- */
-
-held5P =
-
-   "\\s*((?:" + monthsAllT + ") \\d{4})"
-
-   CASE_INSENSITIVE
-
-/**
-
- * Extracts Dates
-
- * Matches the following expression:
-
- *                  JANUARY 16-19, 2001
-
- */
-
-held7P =
-
-   "((?:" + monthsAllT + ") \\d{1,2}-\\d{1,2}, \\d{4})"
-
-   CASE_INSENSITIVE
-
-```
-## Months
-
-```
-monthsAllT = "january|february|march|april|may|june|july|august|september|october|november|december"
-
-```
-## Days
-
-```
-daysAllT = "monday|tuesday|wednesday|thursday|friday|saturday|sunday"
-
-```
-## Held Date All
-
-```
-heldDateP0 =
-
-   {"={3,}","\\n\\s*(?:(?:" + daysAllT + ")[,]+)?((?:" + monthsAllT + ").+\\d{4}\\.?\\s*\\n)"}
-
-   CASE_INSENSITIVE
-
-heldDateP =
-
-   "\\n\\s*(?:(?:" + daysAllT + ")[,]+)?((?:" + monthsAllT + ").+\\d{4}\\.?\\s*\\n)"
-
-   CASE_INSENSITIVE
-
-heldDateP1 =
-
-   "\\n\\s+(?:(?:" + daysAllT + ")[,]+)?((?:" + monthsAllT + ").+\\d{4}\\.?\\s*\\n)"
-
-   CASE_INSENSITIVE
-
-heldDateP2 =
-
-   "\\n\\s+(?:hearing held[\\w\\s,]*)(?:(?:" + daysAllT + ")[,]+)?((?:" + monthsAllT + ").+\\d{4}\\.?\\s*\\n)"
-
-   CASE_INSENSITIVE
-
-heldDateOrderedP =
-
-   "\\n\\s*(?:(?:" + daysAllT + ")[,]+)?((?:" + monthsAllT + ").+\\d{4}\\.(?:\\-\\-Ordered to be printed)?\\s*\\n)"
-
-   CASE_INSENSITIVE
-
-```
-## Held Month
-
-```
-heldMonthP =
-
-   "(" + monthsAllT + ")"
-
-   CASE_INSENSITIVE
-
-```
-## Held Day
-
-```
-heldDayP =
-
-   {"[^0-9](\\d{1,2})[^0-9]",monthsAllT}
-
-   CASE_INSENSITIVE
-
-```
-## Held Year
-
-```
-heldYearP =
+HELD_YEAR_P =
 
    "(\\d{4})"
 
    CASE_INSENSITIVE
+
+HELD_MONTH_P =
+
+   MONTHS
+
+   CASE_INSENSITIVE | MULTILINE
+
+HELD_DAY_P = // pre-match, match, and post-match patterns
+
+   null, "\\D(\\d{1,2})\\D", MONTHS
+
+   CASE_INSENSITIVE | MULTILINE
+
 
 ```
 ## Errata
@@ -836,7 +669,7 @@ heldYearP =
 
  */
 
-errataP =
+ERRATA_P =
 
    "[^\\.]\r?\n *\\[?errata\\]?\r?\n\\s*([^\\.](?:.+\r?\n)*)"
 
@@ -847,8 +680,10 @@ errataP =
 ## Errata Number
 
 ```
-errataNumberSP =
- ** **"\\d+err(\\d*)\\."
+ERR_NUM_SP =
+
+   "\\d+err(\\d*)\\."
+
    CASE_INSENSITIVE
 
 ```
@@ -856,39 +691,50 @@ errataNumberSP =
 ## Table Of Contents
 
 ```
-contentsOldP =
+CONTENTS_P =
 
-   "^\\s+c ?o ?n ?t ?e ?n ?t ?s\r?\n$"
-
-   CASE_INSENSITIVE | MULTILINE | PRESERVE_WHITESPACE| DOTALL
-
-contentsEndOldP =
-
-   "(\r?\n){3}"
-
-   CASE_INSENSITIVE | MULTILINE | PRESERVE_WHITESPACE| DOTALL
-
-contentsP =
-
-   "\\n\\s+C *O *N *T *E *N *T *S\\s*[\\n\\s]+\\-*"
+   "\n\\s+C *O *N *T *E *N *T *S\\s*[\n\\s]+\\-*"
 
    CASE_INSENSITIVE
 
-witnessContentsEndP =
+CONTENTS_END_P =
 
-   "\\n\\.\\s*\\n"
-
-   CASE_INSENSITIVE
-
-contentsEndP =
-
-   "\\n\\s+\\-{8,}\\s+(?:\\-{2})?\\n"
+   "\n\\s+\\-{8,}\\s+(?:\\-{2})?\n"
 
    CASE_INSENSITIVE
 
-contentsEndP2 =
+CONTENTS_END2_P =
 
-   "\\.{5,}\\s*\\d+\\s*\\n"
+   "\\.{5,}\\s*\\d+\\s*\n"
+
+   CASE_INSENSITIVE
+
+```
+
+## Detecting no text or no graphics
+
+```
+NO_TEXT_P =
+
+ 	"(?:\\[|<|\\()(text (file |is |of preliminary )?not available( in (tiff|wais)( format)?| refer to pdf)?)(\\]|>|\\))"
+
+	CASE_INSENSITIVE
+
+NO_TEXT2_P =
+
+ 	"(?:\\[|<|\\() ?(text available in pdf format only) ?(?:\\]|>|\\))"
+
+   CASE_INSENSITIVE
+
+NO_TEXT3_P =
+
+ 	"\n\\s*(This hearing is only available in PDF format)\\."
+
+   CASE_INSENSITIVE
+
+NO_GRAPHICS_P =
+
+ 	"(\\[graphic\\] ?\\[tiff omitted\\])"
 
    CASE_INSENSITIVE
 
@@ -907,7 +753,7 @@ contentsEndP2 =
 
  */
 
-agencyTitleP =
+AGENCY_TITLE_P =
 
    "\\.\r?\n\\s*(Departments? of [^\\W]+)"
 
@@ -923,7 +769,7 @@ agencyTitleP =
 
  */
 
-agencyCoverP =
+AGENCY_COVER_P =
 
    "\n\\s*(Department of [^\n]+)"
 
@@ -934,18 +780,18 @@ agencyCoverP =
 ## Fiscal Year
 
 ```
-fiscalYearP =
+FISCAL_YR_P =   // For obtaining the fiscal year from the title
 
    "(?:Fiscal\\s+year|Appropriations\\s+for)\\s+(\\d{4})"
 
-   MULTILINE|CASE_INSENSITIVE
+   CASE_INSENSITIVE
 
 ```
 
 ## CongHASC, Congress, Number
 
 ```
-congHASCP =
+HASC_P =
 
    "\\[H\\.A\\.S\\.C\\. No\\. (\\d+)-(\\d+)\\]"
 
@@ -956,62 +802,45 @@ congHASCP =
 ## State Names Patterns
 
 ```
-stateNamesPatternS =
+STATES_RX =
 
-"(A|a)labama|(A|a)laska|(A|a)rizona|(A|a)rkansas|(C|c)alifornia|(C|c)olorado|(C|c)onnecticut|(D|d)elaware|" +   "(D|d)istrict\\s*(O|o)f\\s*(C|c)olumbia|(F|f)lorida|(G|g)eorgia|(H|h)awaii|(I|i)daho|(I|i)llinois|(I|i)ndiana|(I|i)owa|(K|k)ansas|" +
-
-"(K|k)entucky|(L|l)ouisiana|(M|m)aine|(M|m)aryland|(M|m)assachusetts|(M|m)ichigan|(M|m)innesota|(M|m)ississippi|" +
-
-"(M|m)issouri|(M|m)ontana|(N|n)ebraska|(N|n)evada|(N|n)ew\\s*(H|h)ampshire|(N|n)ew\\s*(j|J)ersey|(N|n)ew\\s*(M|m)exico|(N|n)ew\\s*(Y|y)ork|" +
-
-"(N|n)orth\\s*(C|c)arolina|(N|n)orth\\s*(D|d)akota|(O|o)hio|(O|o)klahoma|(O|o)regon|(P|p)ennsylvania|(R|r)hode\\s*(I|i)sland|" +
-
-"(S|s)outh\\s*(C|c)arolina|(S|s)outh\\s*(D|d)akota|(T|t)ennessee|(T|t)exas|(U|u)tah|(V|v)ermont|(V|v)irginia|(W|w)ashington|" +
-
-"(W|w)est\\s*(V|v)irginia|(W|w)isconsin|(W|w)yoming|North\\s{2,}|South\\s{2,}|West\\s{2,}|New\\s{2,}"
-
-```
-
-## State Codes Patterns
-
-```
-stateCodesPatternS =
-
-"AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|" +
-
-"MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY"
+   "([Aa](labama|laska|rizona|rkansas)|[Cc](alifornia|olorado|onnecticut)|[Dd]elaware|" +
+	"[Dd]istrict\\s+[Oo]f\\s+[Cc]olumbia|[Ff]lorida|[Gg]eorgia|[Hh]awaii|[Ii](daho|llinois|ndiana|owa)|" +
+	"[Kk](ansas|entucky)|[Ll]ouisiana|[Tt](ennessee|exas)|[Uu]tah|[Vv]ermont|[Oo](hio|klahoma|regon)|" +
+	"[Mm](aine|aryland|assachusetts|ichigan|innesota|ississippi|issouri|ontana)|[Nn](ebraska|evada)|" +
+	"[Nn]ew\\s+([Hh]ampshire|[Jj]ersey|[Mm]exico|[Yy]ork)|([Ww]est\\s+)?[Vv]irginia|" +
+	"([Nn]or|[Ss]ou)th\\s+([Cc]arolina|[Dd]akota)|[Pp]ennsylvania|[Rr]hode\\s+[Ii]sland|" +
+	"[Ww](ashington|isconsin|yoming)|North\\s{2,}|South\\s{2,}|West\\s{2,}|New\\s{2,})"
 
 ```
 
 ## Congress Member Committee
 
 ```
-// original, name, state
+SUFFIX_RX = "|[\\.\\(\\)]| (?! )|, ?(?:[JjSs]r|junior|senior|[Ii]{2,3})"
 
-stateP =
+// original, member name, state
 
-   "(?:\n|\\s{3,})\\s*((?:[A-Z][a-z]?[A-Z]+)\\.?\\s*(?:[A-Z][a-z'-]?[A-Z'`-]+|[A-Z]\\.[A-Z])\\.?\\s*(?:(?:``)?[A-Z]+(?:'')?\\.?\\s*){0,3}\\s*(?:,?\\s*(?:Jr|Sr|jr|sr|junior|senior|ii|iii|II|III)\\.)?),\\s*("+stateNamesPatternS+")"
+STATE_P =
 
-state2P =
+   "(?:\n|  )([A-Z][a-zA-Z'-]*[A-Z]\\.? (?:\\b[A-Z][a-zA-Z'-]*[A-Z]\\b|\\b[A-Z]\\b" + SUFFIX_RX + ")+),\\s*" + STATES_RX
 
-   "(?:\\n|  )([A-Z][a-zA-Z'-]*[A-Z]\\.? (?:\\b[A-Z][a-zA-Z'-]*[A-Z]\\b|\\b[A-Z]\\b|[\\.\\(\\)]| (?! )|, ?(?:Jr|Sr|jr|sr|junior|senior|ii|iii|II|III))+),\\s*("+stateNamesPatternS+")"
+STATE2_P =
 
-state3P =
-
-   "(?:\\n|  )([A-Z][a-zA-Z'-]*[a-z]\\.? (?:\\b[A-Z][a-zA-Z'-]*[a-z]\\b|\\b[A-Z]\\.|[\\.\\(\\)]| (?! )|, ?(?:Jr|Sr|jr|sr|junior|senior|ii|iii|II|III))+),\\s*("+stateNamesPatternS+")"
+   "(?:\n|  )([A-Z][a-zA-Z'-]*[a-z]\\.? (?:\\b[A-Z][a-zA-Z'-]*[a-z]\\b|\\b[A-Z]\\." + SUFFIX_RX + ")+),\\s*" + STATES_RX
 
 ```
 
 ## Other Hosting Organization
 
 ```
-otherHostingOrgP =
+HOST_ORG_P =
 
-   "(?:before +(?:the|a))\\s+(.+?)(?:\\s*(?:" + numbers1T + ")\\s+hundred)"
+   "(?:before +(?:the|a))\\s+(.+?)(?:\\s*" + DIGITS_RX + "\\s+hundred)"
 
-   CASE_INSENSITIVE + DOTALL
+   CASE_INSENSITIVE | DOTALL
 
-otherHostingOrg2P =
+HOST_ORG2_P =
 
    "(CONGRESSIONAL-EXECUTIVE COMMISSION ON\\s*[^\n]+)"
 
@@ -1019,41 +848,51 @@ otherHostingOrg2P =
 
 ```
 
-## Subcommittee
+## Get Day, Month, Year from the file name
 
 ```
-subCommitteeP3 =
+// extract date and addendum number from filename
 
-   {"(CONGRESS\\s*\\n)|(SESSION\\s*\\n)","(subcommittee on.+?)[\\n\\s]{2,}" }
+FILENAME_DATE = "\\d{2}(ja|fe|mr|ap|my|jn|jy|au|se|oc|no|de)\\d{4}\\."
 
-   CASE_INSENSITIVE + DOTALL
+FILENAME_P =
 
-subCommitteeP =
-
-**   ** { "(subcommittee.+?)(?:\\s*\\n){2,}","(?<=\\n) +committee"}
-
-   CASE_INSENSITIVE + DOTALL
-
-subCommitteeP2 =
-
-   {"(before|and|with) the","(.+?subcommittee.*?)(?:of|and|(?:(?:joint )?with)) the\\s*\\n","\\n +committee"}
-
-   CASE_INSENSITIVE + DOTALL
-
-```
-
-## Day, Month, Year
-
-```
-// extract date from filename
-
-fileP =
-
-   "(\\d{2})(ja|fe|mr|ap|my|jn|jy|au|se|oc|no|de)(\\d{4})"
+   "((?:" + FILENAME_DATE + ")?[^\\.]+)(?=\\.)"
 
    CASE_INSENSITIVE
 
+```
 
+## Addendum
+
+```
+ADDENDUM_NUMBER_P =    // from file name
+
+   "add(\\d+)"
+
+   CASE_INSENSITIVE
+
+ADDENDUM_P =           // from file content
+
+ 		"addendum\\s+(\\d+)\\s+"
+
+   CASE_INSENSITIVE
+
+ADDENDUM_ID_P
+
+	"\n *(\\d{2}-\\d{3}).*?-{50,}"
+
+   DOTALL
+
+```
+
+## Detect Locator file
+
+```
+
+LOCATOR_P =
+
+   "\\a(I\\d)"
 
 ```
 
@@ -1062,91 +901,146 @@ fileP =
 ```
 // last name, first name, position
 
-nomineeTOC =
+NOMINEE_TOC_P =
 
-   "\\n(\\w[\\w\\-]+?), +([\\w .]+?), +Nominee (.+?)\\.{5,}\\s*\\d+\\s*\\n"
+   "\n\\s*(\\w[\\w\\- ]+?), +([\\w .]+?), +Nominee (.+?)\\.{5,}\\s*\\d+\\s*\n"
 
-   CASE_INSENSITIVE + DOTALL
+   CASE_INSENSITIVE | DOTALL
 
-nomineeTitle1 =
+NOMINEE_TOC2_P =
 
-   "Nomination of (\\w+ (?:\\w\\.)?) ?(.+?), of ([\\w]+), (to be .+)"
+   "^\\s*([^\n,]+?)\\s+([\\w'-]+),\\s+of\\s+([\\w\\s'-]+),\\s+(to\\s+be\\s+[^\\.]+)\\.+\\s*\\d+\\s*$"
+
+   CASE_INSENSITIVE | MULTILINE
+
+NOMINEE_TOC3_P =
+
+   "\n *([^,\n]+),\\s+([^,]+),\\s+of\\s+(.*?),\\s+nominated\\s+(to\\s+be\\s+[^.]+)\\.+\\s*\\d*\\s*\n"
+
+   CASE_INSENSITIVE | DOTALL
+
+NOMINEE_TITLE_P =
+
+   "Nomination (?:Hearing\\s+)?of +(.+) +(.+?), +of +(.+), +(to be .+)"
 
    CASE_INSENSITIVE
 
-nomineeTitle2 =
+NOMINEE_TITLE2_P =
 
-   "Nomination of (?:\\w{2,4}\\. )?(\\w+ (?:\\w\\.)?) ?(.+?),? (to be .+)"
+   "Nomination (?:Hearing\\s+)?of (?:\\w{2,4}\\. )?(\\w+ (?:\\w\\.)?) ?(.+?),? (to be .+)"
 
    CASE_INSENSITIVE
 
-nomineeTitle3 =
+NOMINEE_TITLE3_P =
 
-   "Nomination of (\\w+ (?:\\w\\.)?) ?(\\w+)"
+   "Nomination (?:Hearing\\s+)?of ((?:(?:[\\w'-]+|\\w\\.)\\s*)+)\\s+([\\w'-]+)"
 
    CASE_INSENSITIVE
 
 ```
 
-## Witness Title
+## Witness
 
 ```
+WITNESS_TOC_END_P =   // end of witness section
 
-witnessTitleP =
+		"\n\\.\\s*\n"
 
-   "\\n\\s*((?:Statements? of )?WITNESS(?:ES\\:?)?)\\s*(?:\\n[a-zA-Z].+?\\:\\s*)?(?=\\n)"
+WITNESS_P =
+
+   "\n\\s*((?:Statements? of )?WITNESS(?:ES\\:?)?)\\s*(?:\n[a-zA-Z].+?\\:\\s*)?(?=\n)"
 
    CASE_INSENSITIVE
 
+WITNESS2_P =   // pre-match, match, and post-match patterns
+
+   null, "\n *(\\w.+?)(?:oral (?:statement|testimony))?\\.*\\s+\\d+(?=\\s*\n)", "((?<=\n)\\s*\n[a-zA-Z][^\n]+?\\:\\s*\n)|((?<=\n)\\s*\n {10,40}[a-zA-Z]+[^\n]*)"
+
+   CASE_INSENSITIVE | DOTALL
+
+WITNESS_DELETE_P
+
+   = "(?<=\n) *(Pa(nel|rt) [IVXCM]+|[_\\-]{3,}|(" + DAYS + ", )?" + MONTHS + " \\d{1,2}, +\\d{4})\\s*\n"
+
 ```
 
-## Witness Information
+## Event ID
 
 ```
+ADDENDUM_EVENT_ID_P =
 
-witnessP2 =
+ 	"EventID\\s+(\\d+).*?-{50,}"
 
-   {"\\n *(\\w.+?)(?:oral (?:statement|testimony))?\\.*\\s+\\d+(?=\\s*\\n)","((?<=\\n)\\s*\\n[a-zA-Z][^\\n]+?\\:\\s*\\n)|((?<=\\n)\\s*\\n {10,40}[a-zA-Z]+[^\\n]*)"}
+   DOTALL | CASE_INSENSITIVE);
 
-   CASE_INSENSITIVE + DOTALL
+URL_EVENT_ID_P =
+
+   "EventID=(\\d+)"
 
 ```
 
 ## Committee Name
 
 ```
-committeeP =
+CMTE_P =      // pre-match, match, and post-match patterns
 
-   {"\\n\\s+(committee.+?)(?:\\s*\\n){2,}","\\s\_{2,}\\s+"}
+   "(of|and|before) the",
+	"(?<=\n)\\s+(((special|select|joint|senate|congressional-executive)\\s+)*(committee|caucus|commission)\\s+on.+)",
+	"\n\\s+and (?:the|a)\\s*(?:sub)?committee|(?:U\\.S\\.\\s+)?HOUSE OF REPRESENTATIVES|UNITED STATES (SENATE|CONGRESS)|\\[GRAPHIC\\(S\\)"
 
-   CASE_INSENSITIVE + DOTALL
+   CASE_INSENSITIVE | DOTALL
 
-committeeP2 =
+CMTE2_P =      // pre-match, match, and post-match patterns
 
-   {"(of|and|before) the","(?<=\\n)\\s+(committee on.+)","(\\n\\s+and the\\s*committee)|(HOUSE OF REPRESENTATIVES)|(UNITED STATES SENATE)"}
+   null,
+	"\n\\s+(committee\\s+on.+)",
+	"\n\\s+and (?:the|a)\\s*(?:sub)committee|(?:U\\.S\\.\\s+)?HOUSE OF REPRESENTATIVES|UNITED STATES (SENATE|CONGRESS)"
 
-   CASE_INSENSITIVE + DOTALL
+   CASE_INSENSITIVE | DOTALL
 
-committeeP3 =
+CMTE3_P =      // pre-match, match, and post-match patterns
 
-   {"\\n\\s+(committee on.+)","(\\n\\s+and the\\s*committee)|(HOUSE OF REPRESENTATIVES)|(UNITED STATES SENATE)"}
+   "(of|and|before) the", "(?<=\n)\\s+(joint economic committee)\\s+.+", "\n\\s+and the\\s*committee|UNITED STATES"
 
-   CASE_INSENSITIVE + DOTALL
+   CASE_INSENSITIVE | DOTALL
 
-committeeP4 =
+CMTE4_P =      // pre-match, match, and post-match patterns
 
-   {"before the","\\n\\s+(.*?committee.+)","(CONGRESS OF THE UNITED STATES)|(HOUSE OF REPRESENTATIVES)"}
+   "(1st|2n?d)\\s+Session(\\s+})?(\\s+Printed for the use of the)?", "\\s+((?:Committee|Commission)\\s+on[^\n]+\\s+)", "\n"
 
-   CASE_INSENSITIVE + DOTALL
+   CASE_INSENSITIVE | DOTALL
+
+CMTE5_P =
+
+   "(congressional\\s*-\\s*executive\\s+commission\\s+on\\s+china)"
+
+   CASE_INSENSITIVE
+
+CMTE6_P =      // pre-match, match, and post-match patterns
+
+   null, "\n\\s+(committee\\s+on.+)", "(?:U\\.S\\.\\s+)?HOUSE OF REPRESENTATIVES|UNITED STATES (SENATE|CONGRESS)"
+
+   CASE_INSENSITIVE | DOTALL
+
+```
+
+## Subcommittee
+
+```
+SUBCMTE_P =      // pre-match, match, and post-match patterns
+
+   "(before|and|with) the", "(.+?subcommittee.*?)(?:of|and|(?:(?:joint )?with)) the\\s*\n", "\n +committee"
+
+   CASE_INSENSITIVE | DOTALL
 
 ```
 
 ## JacketId
 
 ```
-File name matches: ("\\A\\d{5}([a-zA-Z]+[0-9a-zA-Z]*)?\\Z")
+File name matches: "\\d{5}([a-zA-Z]+\\w*)?"
 
-File name matches: ("\\A\\d{5,8}\\Z")
+File name matches: "\\d+"
 
 # Standard Reference Regular Expressions Used on FDsys CHRG Text Files
 
@@ -1156,136 +1050,124 @@ File name matches: ("\\A\\d{5,8}\\Z")
 
 ```
 
-/** Routine to parse a committee name string. Returns a list of matching
+/** 
 
- * committees.
-
- *
-
- * The result of running this utility is the standardized references for the
-
- * committee names.
-
- *
-
- * Parameters:
-
- *  Committee Name / Appropriation Committee: the committee name string
-
- *  Date: the date of the document being parsed
-
- *  Chamber: the default chamber in which to look for committees
-
- * returns a list of matching committee names.
+ * Chamber
 
 */
 
-chamberP =
+CHAMBER_HOUSE_P =
 
-  "(house|representatives|senate|joint|jt)"
+	"\\s+(HOUSE)(?: OF REPRESENTATIVES)\\s"
 
-  CASE_INSENSITIVE
+   CASE_INSENSITIVE
+
+CHAMBER_SENATE_P =
+
+ 	"\\s+(?:UNITED STATES (SENATE)|U.S. (SENATE))\\s"
+
+   CASE_INSENSITIVE
+
+CHAMBER_SENATE2_P =
+
+   " {3,}S\\. +Hrg\\."
+
+   CASE_INSENSITIVE
+
+CHAMBER_JOINT_P =
+
+    "(JOINT) +(SELECT|COMMITTEE|HEARING|ECONOMIC)( +COMMITTEE| +HEARING)?"
+
+   CASE_INSENSITIVE
+
+CHAMBER_JOINT_CSCE_P =
+
+	"\\bCSCE\\s+\\d+-\\d+-\\d+\\b"
+
+   CASE_INSENSITIVE
+
+CHAMBER_FALLBACK_P =
+
+   "(?:(Senate)|(House) of Representatives?)"
+
+   CASE_INSENSITIVE
 
 ```
 
-## Congress Members
+## Congress Members (from foundation CongMemberParser)
 
 ```
-/** Parse a Congress member name and then look it up in the authority files.
- * This routine will parse out all of the components of a name such as "Mr.
- * H. James Saxton Jr. of Ohio" and will then look it up in the authority
- * files.
 
- *
- * Parameters:
- * **   ** extractedName:  The full name, as parsed, of the Congress member
- *    date: The issue date of the document which contains the reference
- *    chamber: The chamber to which the Congress member belongs and returns
- *    the <congMember> element object.
+PREFIXES = "(?<!\\()\\b(ms|mr|miss|mrs)\\b"
 
- */
+PREFIXES_P =
 
-prefixesP =
-
-   "(?<!\\()\\b(ms|mr|miss|mrs)\\b"
+   PREFIXES
 
    CASE_INSENSITIVE
 
-prefixRemoveP =
+DEL_PREFIXES_P =
 
-   "(?<!\\()\\b(ms|mr|miss|mrs)\\b\\.?"
-
-   CASE_INSENSITIVE
-
-suffixesP =
-
-   "\\b(jr|iii|sr|junior|senior)\\b"
+   PREFIXES + "\\.?"
 
    CASE_INSENSITIVE
 
-suffixRemoveP =
+SUFFIXES = "\\b(jr|ii|iii|iv|sr|junior|senior)\\b"
 
-   ",?\\s*\\b(jr|iii|sr|junior|senior) [\\b\\](./../../%5C%5Cb%5C%5C).?"
+SUFFIXES_P =
 
-   CASE_INSENSITIVE
-
-stateNamesPatternS =     "ALABAMA|ALASKA|ARIZONA|ARKANSAS|CALIFORNIA|COLORADO|CONNECTICUT|DELAWARE|" +
-
-"DISTRICT\\s*OF\\s*COLUMBIA|FLORIDA|GEORGIA|HAWAII|IDAHO|ILLINOIS|INDIANA|IOWA|KANSAS|" +
-
-"KENTUCKY|LOUISIANA|MAINE|MARYLAND|MASSACHUSETTS|MICHIGAN|MINNESOTA|MISSISSIPPI|" +
-
-"MISSOURI|MONTANA|NEBRASKA|NEVADA|NEW\\s*HAMPSHIRE|NEW\\s*JERSEY|NEW\\s*MEXICO|NEW\\s*YORK|" +
-
-"NORTH\\s*CAROLINA|NORTH\\s*DAKOTA|OHIO|OKLAHOMA|OREGON|PENNSYLVANIA|RHODE\\s*ISLAND|" +
-
-"SOUTH\\s*CAROLINA|SOUTH\\s*DAKOTA|TENNESSEE|TEXAS|UTAH|VERMONT|VIRGINIA|WASHINGTON|" +
-
-"WEST\\s*VIRGINIA|WISCONSIN|WYOMING"
-
-stateCodesPatternS =
-
-"AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|" +
-
-"MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY"
-
-stateNameP =
-
-   "\\bof\\s+(" + stateNamesPatternS + ")"
+   DEL_SUFFIXES
 
    CASE_INSENSITIVE
 
-stateCodeP =
+DEL_SUFFIXES_P =
 
-   "\\(\\s*(" + stateCodesPatternS + ")"
+   ",?\\s*" + SUFFIXES + "\\.?"
 
    CASE_INSENSITIVE
 
-isStateCodeP =
+STATE_CODES =
 
-    stateCodesPatternS
+	"AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|"
+	+ "NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|AS|GU|PR|VI|MP"
 
-    CASE_INSENSITIVE
+STATE_CODE_P
 
-stateRemoveP =
+   "\\(\\s*(" + STATE_CODES + ")"
+
+   CASE_INSENSITIVE
+
+STATE_NAME_P =
+
+   "\\bof\\s+(ALA(BAM|SK)A|ARIZONA|"
+	+ "(AR)?KANSAS|CALIFORNIA|COLORADO|CONNECTICUT|DELAWARE|DISTRICT\\s*OF\\s*COLUMBIA|FLORIDA|"
+	+ "GEORGIA|HAWAII|IDAHO|ILLINOIS|INDIANA|IOWA|KENTUCKY|LOUISIANA|MAINE|MARYLAND|MASSACHUSETTS|"
+	+ "MICHIGAN|MINNESOTA|MISS(ISSIPP|OUR)I|MONTANA|NE(BRASK|VAD)A|(WEST\\s*)?VIRGINIA|"
+	+ "NEW\\s*(HAMPSHIRE|JERSEY|MEXICO|YORK)|(NOR|SOU)TH\\s*(CAROLIN|DAKOT)A|OHIO|OKLAHOMA|"
+	+ "OREGON|PENNSYLVANIA|RHODE\\s*ISLAND|TENNESSEE|TEXAS|UTAH|VERMONT|WASHINGTON|WISCONSIN|"
+	+ "WYOMING|AMERICAN\\s*SAMOA|GUAM|PUERTO\\s*RICO|(VIRGIN|NORTHERN\\s*MARIANA)\\s*ISLANDS)"
+
+DEL_STATE_P =
 
    "(\\([^\\)]*\\)|\\bof\b.*)"
 
    CASE_INSENSITIVE
 
-lnfNameP =
+NAME_RX = "[\\p{L}][\\p{L}'\\.-]*"
 
-   "([\\p{L}][\\p{L}'\\.-]*)\\s*,\\s*([\\p{L}][\\p{L}'\\.-]*\\b)"
+LNF_NAME_P
 
-   CASE_INSENSITIVE
-
-fnfNameP =
-
-   "([\\p{L}][\\p{L}'\\.-]*)\\s+(?:[\\p{L}][\\p{L}'\\.-]*\\s+)*([\\p{L}][\\p{L}'\\.-]*)"
+	"(" + NAME_RX + ")\\s*,\\s*(" + NAME_RX + "\\b)"
 
    CASE_INSENSITIVE
 
-lastNameOnlyP =
+FNF_NAME_P =
+
+   "(" + NAME_RX + ")\\s+(?:(?:\"|``|'')?" + NAME_RX + "(?:\"|``|'')?\\s+)*(" + NAME_RX + ")"
+
+   CASE_INSENSITIVE
+
+LAST_NAME_ONLY_P =
 
    "([\\p{L}][\\p{L}'-]*)"
 
@@ -1293,58 +1175,41 @@ lastNameOnlyP =
 
 ```
 
-## Public Laws
+## Public Laws (from StandardRefParser)
 
 ```
-lawContentP =
+LAW_P =
 
-"(\\b(?:Public|Private|Pub|Priv|Pvt|P)\\.*\\s*(?:Law|L|R)\\.*)\\s*(?:No\\.)?\\s*(\\d+)[-\\xAD]+\\s*(\\d+)"
+   "(\\bP(?:ublic|rivate|ub|riv|vt)?\\.*\\s*(?:Law|L|R)\\.*)\\s*(?:No[:.])?\\s*(\\d+)[-\\xAD]+\\s*(\\d+)"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
-multiLawContentP =
+MULTI_LAW_P =
 
-"(\\b(?:Public|Private|Pub|Priv|Pvt)\\.?\\s*(?:Laws|L)\\.?)\\s*(?:Nos?\\.|Numbers?)?(\\s*\\d+[-\\xAD]+\\s*\\d+(?:\\b\\d+[-\\xAD]+\\s*\\d+|,|and|\\s+)+)"
+   "(\\bP(?:ublic|rivate|ub|riv|vt)\\.?\\s*L(?:aws)?\\.?)\\s*(?:Nos?\\.|Numbers?)?(\\s*\\d+[-\\xAD]+\\s*\\d+(?:\\b\\d+[-\\xAD]+\\s*\\d+|,|and|\\s+)+)"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
-multiLawNumbersP =
+MULTI_LAW_NOS_P =
 
-   "( [\\d+)[-\\xAD]*\\s*(\\d+)")](./../../%5C%5Cd+)%5B-%5C%5CxAD%5D*%5C%5Cs*(%5C%5Cd+)%22))
-
-
+   "(\\d+)[-\\xAD]*\\s*(\\d+)"
 
 ```
 
 ## United States Code
 
 ```
-uscT =
+USC = "U\\.?\\s*S\\.?\\s*C(?:\\.|ode)?\\s*"
 
-   "U\\.?\\s*S\\.?\\s*C(?:\\.|ode)?\\s*"
+USC_LONG = "\\s*UNITED\\s*STATES\\s*CODE"
 
-postAUscT =
+IRC = "\\b(Internal\\s*Revenue\\s*Code)\\b\\s*";
 
-   "app\\.|Appendix"
+IRC_ONLY =
 
-singleSectionNoCaptureRegex =
+   IRC
 
-   "\\d[a-z0-9-]*\\b(?:\\([a-z0-9]+\\))*(?:\\s+note|\\s+et seq\\.?)?"
-
-singleChapterNoCaptureRegex =
-
- "\\d[a-z0-9-]*\\b"
-
-/**
- * Matches following formats: chapter 8 of title 212, United States Code
- * Section 1477 of title 10, United States Code
- */
-
-usCodeLargeP =
-
-   "(?:sections?\\s*(\\w+)\\s*(?:of\\s*))?CHAPTERS?\\s*(\\d+[a-z]*) of title (\\d+),\\s*UNITED\\s*STATES\\s*CODE"
-
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 /**
  * Matches the following formats: 42 USC 1526 42 U.S.C. 1526 42 U.S.
@@ -1353,36 +1218,128 @@ usCodeLargeP =
  * 1553, 1555, and 1561
  *
  */
+USC_SHORT_P =
 
-usCodeShortA2P =
+ 	"(\\d+)\\s*" + USC + "app(?:\\.|endix)\\s*(?:((?:(?:and )?\\d+[a-z]*(?:,\\s*)?)+(?:-[\\w]+)?)((?:\\([\\w]+\\))*\\s*(?:note|et seq\\.)?))"
 
-   "([0-9]+)\\s*" + uscT + "(?:" + postAUscT + ")\\s*(?:((?:(?:and )?\\d+[a-z]*(?:,\\s*)?)+(?:-[\\w]+)?)((?:\\([\\w]+\\))*\\s*(?:note|et seq\\.)?))"
+   CASE_INSENSITIVE
 
-   CASE_INSENSITIVE | MULTILINE
+IRC_SHORT_P =
 
-usCodeLarge2P =
+   IRC + "app(?:\\.|endix)\\s*(?:((?:(?:and )?\\d+[a-z]*(?:,\\s*)?)+(?:-[\\w]+)?)((?:\\([\\w]+\\))*\\s*(?:note|et seq\\.)?))"
 
-   "CHAPTER\\s*(\\d+[a-z]*)(?: \\([^\\)]*\\)) of title (\\d+),\\s*UNITED\\s*STATES\\s*CODE"
+   CASE_INSENSITIVE
 
-   CASE_INSENSITIVE | MULTILINE
+/**
+ * Matches following formats: chapter 8 of title 212, United States Code
+ * Section 1477 of title 10, United States Code
+ */
+USC_LONG_P =
 
-usCodeMultiLargeSectionsBP =
+   "(?:sections?\\s*(\\w+)\\s*(?:of\\s*))?CHAPTERS?\\s*(\\d+[a-z]*)\\s+of\\s+title\\s+(\\d+)," + USC_LONG
 
-"sections?\\s+(.{1,100}?)\\s+of\\s+title\\s+(\\d+)(?:,|\\sof\\s+the)?\\s+united\\s+states\\s+code"
+   CASE_INSENSITIVE
+
+IRC_LONG_P
+
+    "(?:sections?\\s*(\\w+)\\s*(?:of\\s*))?CHAPTERS?\\s*(\\d+[a-z]*)\\s+of\\s+the\\s+" + IRC
+
+   CASE_INSENSITIVE
+
+USC_LONG2_P =
+
+ 	"CHAPTER\\s*(\\d+[a-z]*)(?:\\s+\\([^\\)]*\\))\\s+of\\s+title\\s+(\\d+)," + USC_LONG
+
+   CASE_INSENSITIVE
+
+IRC_LONG2_P
+
+ 	"CHAPTER\\s*(\\d+[a-z]*)(?:\\s+\\([^\\)]*\\))\\s+of\\s+the\\s+" + IRC
+
+   CASE_INSENSITIVE
+
+USC_MULTI_LONG_P =
+
+    "sections?\\s+(.{1,100}?)\\s+of\\s+title\\s+(\\d+)(?:,|\\sof\\s+the)?" + USC_LONG
 
    CASE_INSENSITIVE | DOTALL
 
-usCodeMultiShortSectionsP =
+USC_MULTI_SHORT_SECT_P =
 
-   "([0-9]+) [\\s*](./../../%5C%5Cs*)" + uscT + "(?:sections?|sec\\.?)?\\s*" + "((?:" +  singleSectionNoCaptureRegex + "(?!\\s+"  + uscT + ")" + "|and|through|,|\\s)+)"
+   "(\\d+)\\s*" + USC + "(?:sections?|sec\\.?)?\\s*\\xA7?\\s*\\s*((?:\\d[\\w-]*\\b(?:\\(\\w+\\))*(?:\\s+note|\\s+et seq\\.?)?(?!\\s+" + USC + ")|and|through|,|\\s)+)"
 
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
+   
+IRC_MULTI_SHORT_SECT_P =
 
-usCodeMultiShortChaptersP =
+   IRC + "(?:sections?|sec\\.?)?\\s*\\xA7?\\s*\\s*((?:\\d[\\w-]*\\b(?:\\(\\w+\\))*(?:\\s+note|\\s+et seq\\.?)?(?!\\s+" + USC + ")|and|through|,|\\s)+)"
 
-   "([0-9]+)\\s*" + uscT + "(?:chapters?|ch\\.?)\\s*" + "((?:" + singleChapterNoCaptureRegex + "(?!\\s+"  + uscT + ")" + "|and|through|,|\\s)+)"
+   CASE_INSENSITIVE
 
-   CASE_INSENSITIVE | MULTILINE
+USC_MULTI_CHAP_P = 
+
+   "(\\d+)\\s*" + USC + "ch(?:apters?|\\.?)\\s*((?:\\d[\\w-]*\\b(?!\\s+" + USC + ")|and|through|,|\\s)+)"
+
+   CASE_INSENSITIVE
+
+IRC_MULTI_CHAP_P = 
+
+   IRC + "ch(?:apters?|\\.?)\\s*((?:\\d[\\w-]*\\b(?!\\s+" + USC + ")|and|through|,|\\s)+)"
+
+   CASE_INSENSITIVE
+
+
+// Search patterns in support of processing multisection or multi-chapter UC Code references
+
+USC_SECT_RX = "(?<![\\(])(\\d+[\\w-]*)((?:\\(\\w+\\))*(?:\\s+note|\\s+et seq\\.?)?)";
+
+USC_CHAP_RX = "(?<![\\(])(\\d+[\\w-]*)";
+
+USC_SECT_P = 
+
+   USC_SECT_RX
+
+   CASE_INSENSITIVE
+
+USC_CHAP_P =
+
+   USC_CHAP_RX
+
+   CASE_INSENSITIVE
+
+CONNECTORS_SP =
+
+   "(,|through|and)"
+
+   CASE_INSENSITIVE
+
+SINGLE_SECT_SP =
+
+   USC_SECT_RX
+
+   CASE_INSENSITIVE
+
+SINGLE_CHAP_SP =
+
+   USC_CHAP_RX
+
+   CASE_INSENSITIVE
+
+BRACKETS_SP =
+
+   "(\\(|\\))")
+
+SECT_WORD_SP =
+
+   "\\bsec(tion|\\.)?"
+
+   CASE_INSENSITIVE
+
+CHAP_WORD_SP =
+
+   "\\bch(apter|\\.)?"
+
+   CASE_INSENSITIVE
 
 ```
 
@@ -1420,39 +1377,30 @@ statuteAtLargeP =
  *
  */
 
-billContentP =
+BILL_TYPE_RX = "((?:house\\s+|senate\\s+|h\\.?|s\\.?)\\s*(?:bill|(?:joint\\s+|j\\.?|concurrent\\s+|con\\.?)?"
+   + "\\s*(?:resolution|res\\.?))|h\\.?\\s*r\\.?|(?<!\\.)s\\.)\\s*(?:No\\.)?\\s*(\\d+)";
 
-   \\b(?:( + billTypeT + ")\\s*(?:No\\.)?\\s*(\\d+)(?:-\\s*(\\d+))?)\\s*(?:(?:of\\sthe|\\()\\s*(\\d+)(t|th|nd|d|rd)\\sCONGRESS\\)?)?"
+BILL_REF_P =
+   
+   BILL_TYPE_RX + "(?:-\\s*(\\d+))?)\\s*(?:(?:of\\sthe|\\()\\s*(\\d+)(th?|[nr]?d)\\sCONGRESS\\)?)?"
 
-   CASE_INSENSITIVE
+   CASE_INSENSITIVE);
 
-billContent2P =
+BILL_REF2_P =
 
-   "(" + billTypeT + ")\\s*(?:No\\.)?\\s*(\\d+),?(?:-\\s*(\\d+))?\\s+(?:of\\s+the|\\()?\\s*(?:One\\s+Hundred\\s+([a-z]+)|(One Hundredth))\\s+Congress"
+    ",?(?:-\\s*(\\d+))?\\s+(?:of\\s+the|\\()?\\s*(?:One\\s+Hundred\\s+([a-z]+)|(One Hundredth))\\s+Congress"
 
-   CASE_INSENSITIVE
+   CASE_INSENSITIVE);
 
-billContent3P =
+BILL_REF3_P =
 
-   "(" + billTypeT + ")\\s*(?:No\\.)? *(\\d+),?(?:- *(\\d+))? +(?:of +the|\\()? *(Ninety-(?:[a-z]+)|(Ninetieth)) +Congress"
+   ",?(?:- *(\\d+))? +(?:of +the|\\()? *((?:Seven|Eigh|Nine)(?:ty-(?:[a-z]+)|tieth))\\s+Congress"
 
-   CASE_INSENSITIVE
+	CASE_INSENSITIVE);
 
-billContent4P =
+BILL_REF4_P =
 
-   "(" + billTypeT + ")\\s*(?:No\\.)? *(\\d+),?(?:- *(\\d+))? +(?:of +the|\\()? *(Eighty-(?:[a-z]+)|(Eightieth)) +Congress"
-
-   CASE_INSENSITIVE
-
-billContent5P =
-
-   "(" + billTypeT + ")\\s*(?:No\\.)? *(\\d+),?(?:- *(\\d+))? +(?:of +the|\\()? *(Seventy-(?:[a-z]+)|(Seventieth)) +Congress"
-
-   CASE_INSENSITIVE
-
-billContent6P =
-
-   \\b(?:( + billTypeT + ")\\s*(?:No\\.)?\\s*(\\d+)(?:-\\s*(\\d+))?),\\s*(\\d{2,3})-[1-2], +"
+	BILL_TYPE_RX + "(?:-\\s*(\\d+))?),\\s*(\\d{2,3})-[1-2], +"
 
    CASE_INSENSITIVE
 
@@ -1461,164 +1409,115 @@ billContent6P =
 ## Congressional Reports
 
 ```
-reportVariationsT =
+PART_OR_VOLUME = "\\s+(\\d+)\\s*-\\s*(\\d+)\\s*(,\\s*((?:Pt\\.|Part|Volume|Vol\\.|and|[0-9])*\\s*(?:Pt\\.|Part|Vol\\.|Volume|[0-9])(\\([^)]+\\)\\s*)))?";
 
-   "(?:Rept|Rpt|Report)\\.?\\s*(?:(?:Number|No)\\.?)?"
+REPORT_NO = "\\.?\\s*R(?:e?pt|eport)\\.?\\s*(?:N(?:umber|o)\\.?)?)"
 
-congReportHouseT =
+HOUSE_REPORT_P =
 
-   "\\b((?:House|H)\\.?\\s* + reportVariationsT + ")"
+ 	"\\b(H(?:ouse)?" + REPORT_NO + PART_OR_VOLUME
 
-referenceDocT =
+   CASE_INSENSITIVE
 
-   "\\s+(\\d+)\\s*-\\s*(\\d+)\\s*(,\\s*((?:Pt\\.|Part|Volume|Vol\\.|and|[0-9])*\\s*(?:Pt\\.|Part|Vol\\.|Volume|[0-9])(\\([^)]+\\)\\s*)))?"
+SENATE_REPORT_P =
 
-congReportSenateT =
+ 	"\\b(S(?:enate)?" + REPORT_NO + PART_OR_VOLUME
 
-   \\b((?:Senate|S)\\.?\\s* + reportVariationsT + ")"
+   CASE_INSENSITIVE
 
-congReportExecutiveT =
+EXEC_REPORT_P =
 
-   "((?:Ex|Exec|Executive)\\.?\\s*" + reportVariationsT + ")"
+    "(Ex(?:ec(?:utive)?)?" + REPORT_NO + PART_OR_VOLUME
 
-congReportConferenceT =
+   CASE_INSENSITIVE)
 
-   "((?:Conf|Conference)\\.?\\s*" + reportVariationsT + ")"
+HOUSE_CONF_REPORT_P =
 
-congReportHouseP =
+ 	"(Conference Report \\(?:H\\. Rept\\.\\))" + PART_OR_VOLUME
 
-   congReportHouseT + referenceDocT
+   CASE_INSENSITIVE
 
-   CASE_INSENSITIVE | MULTILINE
+CONF_REPORT_P =
 
-congReportSenateP =
+	"(Conf(?:erence)?" + REPORT_NO + PART_OR_VOLUME
 
-   congReportSenateT + referenceDocT
-
-   CASE_INSENSITIVE | MULTILINE
-
-congReportExecutiveP =
-
-   congReportExecutiveT + referenceDocT
-
-   CASE_INSENSITIVE | MULTILINE
-
-congReportConferenceP =
-
-   congReportConferenceT + referenceDocT
-
-   CASE_INSENSITIVE | MULTILINE
-
-congReportHouseConferenceP =
-
-   "(Conference Report \\(?:H\\. Rept\\.\\))" + referenceDocT
-
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 ```
 
 ## Congressional Documents
 
 ```
-referenceDocT =
+DOC_NUM = "\\.?\\s*Doc(?:ument(?:ation)?)?\\.?\\s*(?:N(?:o|umber)\\.?)?";
 
-   "\\s+(\\d+)\\s*-\\s*(\\d+)\\s*(,\\s*((?:Pt\\.|Part|Volume|Vol\\.|and|[0-9])*\\s*(?:Pt\\.|Part|Vol\\.|Volume|[0-9])(\\([^)]+\\)\\s*)))?"
+HOUSE_DOC = "(H(?:ouse)?" + DOC_NUM + ")";
 
-docVariationsT =
+HOUSE_DOC_P =
 
-   "(?:Doc|Document|Documentation)\\.?\\s*(?:(?:No|Number)\\.?)?"
+   HOUSE_DOC + PART_OR_VOLUME
 
-congDocumentHouseT =
+   CASE_INSENSITIVE
 
-   "((?:H|House)\\.?\\s*" + docVariationsT + ")"
+HOUSE_DOC2_P =
 
-referenceT =
+   HOUSE_DOC + "(?:\\.?\\s+([\\dA-Z]+),\\s*(?:(\\d+)(?:th|[nr]d|st)\\s*Cong(?:ress)?\\.?))"
 
-   "(?:\\.?\\s+([\\dA-Z]+),\\s*(?:(\\d+)(?:th|nd|rd|st)\\s*(?:Cong|Congress)\\.?))"
+   CASE_INSENSITIVE
 
-congDocumentSenateT =
+SENATE_DOC_P =
 
-   "((?:S|Senate)\\.?\\s*" + docVariationsT + ")"
+    "((?:S|Senate)" + DOC_NUM + ")" + PART_OR_VOLUME
 
-congDocumentHouseP =
+   CASE_INSENSITIVE
 
-   congDocumentHouseT + referenceDocT
+TREATY_DOC = "((?:(?:Senate)?\\s*T(?:reaty)?)\\.?\\s*" + DOC_NUM + ")";
 
-   CASE_INSENSITIVE | MULTILINE
+TREATY_DOC_P =
 
-congDocumentHouse3P =
+   TREATY_DOC + PART_OR_VOLUME
 
-   congDocumentHouseT + referenceT
+   CASE_INSENSITIVE
 
-   CASE_INSENSITIVE | MULTILINE
+TREATY_DOC2_P =
 
-congDocumentSenateP =
+   TREATY_DOC + "\\s+(\\d+)-(\\d+)\\s*"
 
-   congDocumentSenateT + referenceDocT
-
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 ```
 
 ## Congressional Hearings
 
 ```
-referenceDocT =
+SENATE_HEARING_P =
 
-   "\\s+(\\d+)\\s*-\\s*(\\d+)\\s*(,\\s*((?:Pt\\.|Part|Volume|Vol\\.|and|[0-9])*\\s*(?:Pt\\.|Part|Vol\\.|Volume|[0-9])(\\([^)]+\\)\\s*)))?"
+ 	"(S)(?:enate)?\\.?\\s*(?:Hrg|Hearing)\\.?" + PART_OR_VOLUME
 
-senateCongressHearingsT =
-
-   "(S)(?:enate)?\\.?\\s*(?:Hrg|Hearing)\\.?"
-
-senateCongressHearingsP =
-
-   senateCongressHearingsT + referenceDocT
-
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 ```
 
 ## Congressional Committee Prints
 
 ```
-referenceDocT =
+COMMITTEE_PRINT_P =
 
-   "\\s+(\\d+)\\s*-\\s*(\\d+)\\s*(,\\s*((?:Pt\\.|Part|Volume|Vol\\.|and|[0-9])*\\s*(?:Pt\\.|Part|Vol\\.|Volume|[0-9])(\\([^)]+\\)\\s*)))?"
+ 	"(S)(?:enate)?\\.?\\s*(?:Prt|Print)\\.?\\s*(?:(?:No|Number)\\.?)?" + PART_OR_VOLUME
 
-senateCongCommPrintsT =
-   "(S)(?:enate)?\\.?\\s*(?:Prt|Print)\\.?\\s*(?:(?:No|Number)\\.?)?"
-
-senateCongCommPrintsP =
-
-   senateCongCommPrintsT + referenceDocT
-
-   CASE_INSENSITIVE | MULTILINE
+   CASE_INSENSITIVE
 
 ```
 
 ## Code of Federal Regulations
 
 ```
-cfrContentPNew =
+CFR_P =
 
-   "([1-50])\\s*CFR\\s*(Chapters?|Ch\\.|Parts?|Sec\\.|sections?)*\\s*"
+	// number:
+	"([1-5]?\\d)\\s*CFR\\s*(Chapters?|Ch\\.|Parts?|Sec\\.|sections?)*\\s*([\\d]+|\\d+|[IVXLCDM]+),?\\s*"
+	// detail:
+	+ "((?:(?:et (seq|al)\\.)|(?:\\s*(and|through|or|,)\\s+)|(?:(\\d+,?\\s)+)|"
+	+ "(?:\\-?\\d+(?:\\.\\d+)?(?:\\(\\w+\\))*)|(?:\\.\\w+(?:\\(\\w+\\))*))+)?",
+	CASE_INSENSITIVE
 
-   // number:
-
-   + "([\\d]+|\\d+|[ILMVX]+),?\\s*"
-
-   // detail:
-
-   + "((?:(?:et (seq|al)\\.)|"
-
-   + "(?:\\s*(and|through|or|,)\\s+)|"
-
-   + "(?:(\\d+,?\\s)+)|"
-
-   + "(?:\\-?\\d+(?:\\.\\d+)?(?:\\([0-9a-z]+\\))*)|"
-
-   + "(?:\\.[0-9a-z]+(?:\\([0-9a-z]+\\))*))+)?"
-
-   CASE_INSENSITIVE
 ```
